@@ -29,7 +29,7 @@
 #endregion
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace NClassifier.Bayesian
 {
@@ -39,40 +39,55 @@ namespace NClassifier.Bayesian
 	public class BayesianClassifier : AbstractClassifier, ITrainableClassifier
 	{
 		#region Fields
-		IWordsDataSource _wordsData;
-		ITokenizer _tokenizer;
-		IStopWordProvider _stopWordProvider;
-		bool _isCaseSensitive = false;
+
+		private readonly IWordsDataSource _wordsData;
+		private readonly ITokenizer _tokenizer;
+		private readonly IStopWordProvider _stopWordProvider;
+		private bool _isCaseSensitive;
+
 		#endregion
 
 		#region Properties
+
 		public bool IsCaseSensitive { get { return _isCaseSensitive; } set { _isCaseSensitive = value; } }
 		public IWordsDataSource WordsDataSource { get { return _wordsData; } }
 		public ITokenizer Tokenizer { get { return _tokenizer; } }
 		public IStopWordProvider StopWordProvider { get { return _stopWordProvider; } }
+
 		#endregion
 
 		#region Constructors
+
 		public BayesianClassifier() : this(new SimpleWordsDataSource(), new DefaultTokenizer(DefaultTokenizer.BREAK_ON_WORD_BREAKS)) {}
 
-		public BayesianClassifier(IWordsDataSource wd) : this(wd, new DefaultTokenizer(DefaultTokenizer.BREAK_ON_WORD_BREAKS)) {}
+		public BayesianClassifier(IWordsDataSource wordsDataSource) : this(wordsDataSource, new DefaultTokenizer(DefaultTokenizer.BREAK_ON_WORD_BREAKS)) {}
 
-		public BayesianClassifier(IWordsDataSource wd, ITokenizer tokenizer) : this(wd, tokenizer, new DefaultStopWordProvider()) {}
+		public BayesianClassifier(IWordsDataSource wordsDataSource, ITokenizer tokenizer) : this(wordsDataSource, tokenizer, new DefaultStopWordProvider()) {}
 
-		public BayesianClassifier(IWordsDataSource wd, ITokenizer tokenizer, IStopWordProvider swp)
+		public BayesianClassifier(IWordsDataSource wordsDataSource, ITokenizer tokenizer, IStopWordProvider stopWordProvider)
 		{
-			if (wd == null)
-				throw new ArgumentNullException("IWordsDataSource cannot be null.");
-			_wordsData = wd;
+			if (wordsDataSource == null)
+			{
+				throw new ArgumentNullException("wordsDataSource");
+			}
+
+			_wordsData = wordsDataSource;
 
 			if (tokenizer == null)
-				throw new ArgumentNullException("ITokenizer cannot be null.");
+			{
+				throw new ArgumentNullException("tokenizer");
+			}
+
 			_tokenizer = tokenizer;
 
-			if (swp == null)
-				throw new ArgumentNullException("IStopWordProvider cannot be null.");
-			_stopWordProvider = swp;
+			if (stopWordProvider == null)
+			{
+				throw new ArgumentNullException("stopWordProvider");
+			}
+
+			_stopWordProvider = stopWordProvider;
 		}
+
 		#endregion
 
 		public bool IsMatch(string category, string input)
@@ -88,9 +103,14 @@ namespace NClassifier.Bayesian
 		public double Classify(string category, string input)
 		{
 			if (category == null)
-				throw new ArgumentNullException("Category cannot be null.");
+			{
+				throw new ArgumentNullException(category);
+			}
+
 			if (input == null)
-				throw new ArgumentNullException("Input cannot be null.");
+			{
+				throw new ArgumentNullException(input);
+			}
 
 			CheckCategoriesSupported(category);
 
@@ -99,7 +119,7 @@ namespace NClassifier.Bayesian
 
 		public double Classify(string category, string[] words)
 		{
-			WordProbability[] wps = CalcWordsProbability(category, words);
+			var wps = CalcWordsProbability(category, words);
 			return NormalizeSignificance(CalculateOverallProbability(wps));
 		}
 
@@ -116,9 +136,14 @@ namespace NClassifier.Bayesian
 		public void TeachMatch(string category, string input)
 		{
 			if (category == null)
-				throw new ArgumentNullException("Category cannot be null.");
+			{
+				throw new ArgumentNullException("category");
+			}
+
 			if (input == null)
-				throw new ArgumentNullException("Input cannot be null.");
+			{
+				throw new ArgumentNullException("input");
+			}
 
 			CheckCategoriesSupported(category);
 
@@ -128,9 +153,14 @@ namespace NClassifier.Bayesian
 		public void TeachNonMatch(string category, string input)
 		{
 			if (category == null)
-				throw new ArgumentNullException("Category cannot be null.");
+			{
+				throw new ArgumentNullException("category");
+			}
+
 			if (input == null)
-				throw new ArgumentNullException("Input cannot be null.");
+			{
+				throw new ArgumentNullException("input");
+			}
 
 			CheckCategoriesSupported(category);
 
@@ -140,47 +170,58 @@ namespace NClassifier.Bayesian
 		public bool IsMatch(string category, string[] input)
 		{
 			if (category == null)
-				throw new ArgumentNullException("Category cannot be null.");
+			{
+				throw new ArgumentNullException("category");
+			}
+
 			if (input == null)
-				throw new ArgumentNullException("Input cannot be null.");
+			{
+				throw new ArgumentNullException("input");
+			}
 
 			CheckCategoriesSupported(category);
 
-			double matchProbability = Classify(category, input);
+			var matchProbability = Classify(category, input);
 
-			return (matchProbability >= cutoff);
+			return matchProbability >= cutoff;
 		}
 
 		public void TeachMatch(string category, string[] words)
 		{
-			bool categorize = false;
-			if (_wordsData is ICategorizedWordsDataSource)
-				categorize = true;
-			for (int i = 0; i <= words.Length - 1; i++)
+			var categorizedWordsDataSource = _wordsData as ICategorizedWordsDataSource;
+
+			for (var i = 0; i < words.Length; i++)
 			{
 				if (IsClassifiableWord(words[i]))
 				{
-					if (categorize)
-						((ICategorizedWordsDataSource)_wordsData).AddMatch(category, TransformWord(words[i]));
-					else
+					if (categorizedWordsDataSource == null)
+					{
 						_wordsData.AddMatch(TransformWord(words[i]));
+					}
+					else
+					{
+						categorizedWordsDataSource.AddMatch(category, TransformWord(words[i]));
+					}
 				}
 			}
 		}
 
 		public void TeachNonMatch(string category, string[] words)
 		{
-			bool categorize = false;
-			if (_wordsData is ICategorizedWordsDataSource)
-				categorize = true;
-			for (int i = 0; i <= words.Length - 1; i++)
+			var categorizedWordsDataSource = _wordsData as ICategorizedWordsDataSource;
+
+			for (var i = 0; i < words.Length; i++)
 			{
 				if (IsClassifiableWord(words[i]))
 				{
-					if (categorize)
-						((ICategorizedWordsDataSource)_wordsData).AddNonMatch(category, TransformWord(words[i]));
-					else
+					if (categorizedWordsDataSource == null)
+					{
 						_wordsData.AddNonMatch(TransformWord(words[i]));
+					}
+					else
+					{
+						categorizedWordsDataSource.AddNonMatch(category, TransformWord(words[i]));
+					}
 				}
 			}
 		}
@@ -192,104 +233,102 @@ namespace NClassifier.Bayesian
 		/// <returns>The transformed word.</returns>
 		public string TransformWord(string word)
 		{
-			if (word != null)
+			if (word == null)
 			{
-				if (!_isCaseSensitive)
-					return word.ToLower();
-				else
-					return word;
+				throw new ArgumentNullException("word");
 			}
-			else
-				throw new ArgumentNullException("Word cannot be null.");
+			
+			return _isCaseSensitive ? word : word.ToLower();
 		}
 
-		public double CalculateOverallProbability(WordProbability[] wps)
+		public double CalculateOverallProbability(IList<WordProbability> wps)
 		{
-			if (wps == null || wps.Length == 0)
+			if (wps == null || wps.Count == 0)
+			{
 				return IClassifierConstants.NEUTRAL_PROBABILITY;
+			}
 
 			// we need to calculate xy/(xy + z) where z = (1 - x)(1 - y)
 			
 			// first calculate z and xy
-			double z = 0d;
-			double xy = 0d;
-			for (int i = 0; i < wps.Length; i++)
+			var z = 0d;
+			var xy = 0d;
+			for (var i = 0; i < wps.Count; i++)
 			{
-				if (z == 0)
-					z = (1 - wps[i].Probability);
-				else
-					z = z * (1 - wps[i].Probability);
-
-				if (xy == 0)
-					xy = wps[i].Probability;
-				else
-					xy = xy * wps[i].Probability;                    
+				z = z == 0 ? 1 - wps[i].Probability : z*(1 - wps[i].Probability);
+				xy = xy == 0 ? wps[i].Probability : xy*wps[i].Probability;
 			}
 
-			double numerator = xy;
-			double denominator = xy + z;
+			var numerator = xy;
+			var denominator = xy + z;
 
 			return numerator / denominator;
 		}
 
-		private WordProbability[] CalcWordsProbability(string category, string[] words)
+		private IList<WordProbability> CalcWordsProbability(string category, string[] words)
 		{
 			if (category == null)
 				throw new ArgumentNullException("Category cannot be null.");
 
-			bool categorize = false;
-			if (_wordsData is ICategorizedWordsDataSource)
-				categorize = true;
+			var categorizedWordsDataSource = _wordsData as ICategorizedWordsDataSource;
 
 			CheckCategoriesSupported(category);
 			
 			if (words == null)
 				return new WordProbability[0];
-			else
+			
+			var wps = new List<WordProbability>();
+			for (var i = 0; i < words.Length; i++)
 			{
-				ArrayList wps = new ArrayList();
-				for (int i = 0; i < words.Length; i++)
+				if (IsClassifiableWord(words[i]))
 				{
-					if (IsClassifiableWord(words[i]))
+					WordProbability wp = null;
+					if (categorizedWordsDataSource == null)
 					{
-						WordProbability wp = null;
-						if (categorize)
-							wp = ((ICategorizedWordsDataSource)_wordsData).GetWordProbability(category, TransformWord(words[i]));
-						else
-							wp = _wordsData.GetWordProbability(TransformWord(words[i]));
+						wp = _wordsData.GetWordProbability(TransformWord(words[i]));
+					}
+					else
+					{
+						categorizedWordsDataSource.GetWordProbability(category, TransformWord(words[i]));
+					}
 
-						if (wp != null)
-							wps.Add(wp);
+					if (wp != null)
+					{
+						wps.Add(wp);
 					}
 				}
-				return (WordProbability[])wps.ToArray(typeof(WordProbability));
 			}
+
+			return wps;
 		}
 
 		private void CheckCategoriesSupported(string category)
 		{
 			// if the category is not the default
-			if (ICategorizedClassifierConstants.DEFAULT_CATEGORY != category)
-				if (!(_wordsData is ICategorizedWordsDataSource))
-					throw new ArgumentException("Word Data Source does not support non-default categories.");
+			if (ICategorizedClassifierConstants.DEFAULT_CATEGORY != category && !(_wordsData is ICategorizedWordsDataSource))
+			{
+				throw new ArgumentException("Word Data Source does not support non-default categories.");
+			}
 		}
 
 		private bool IsClassifiableWord(string word)
 		{
-			if (word == null || word == string.Empty || _stopWordProvider.IsStopWord(word))
-				return false;
-			else
-				return true;
+			return !string.IsNullOrEmpty(word) && !_stopWordProvider.IsStopWord(word);
 		}
 
 		public static double NormalizeSignificance(double sig)
 		{
 			if (IClassifierConstants.UPPER_BOUND < sig)
+			{
 				return IClassifierConstants.UPPER_BOUND;
-			else if (IClassifierConstants.LOWER_BOUND > sig)
+			}
+
+			if (IClassifierConstants.LOWER_BOUND > sig)
+			{
 				return IClassifierConstants.LOWER_BOUND;
-			else
-				return sig;
+			}
+			
+			return sig;
 		}
 	}
 }

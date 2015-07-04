@@ -28,10 +28,9 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using System.Diagnostics;
-using NUnit.Framework;
 using NClassifier.Bayesian;
+using NUnit.Framework;
 
 namespace NClassifier.Tests.Bayesian
 {
@@ -123,7 +122,7 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestComparer()
 		{
-			string method = "TestComparer() ";
+			var method = "TestComparer() ";
 
 			WordProbability wp = null;
 			WordProbability wp2 = null;
@@ -148,7 +147,7 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestMatchingAndNonMatchingCountRollover()
 		{
-			WordProbability wp = new WordProbability("aWord", long.MaxValue, long.MaxValue);
+			var wp = new WordProbability("aWord", long.MaxValue, long.MaxValue);
 			try
 			{
 				wp.RegisterMatch();

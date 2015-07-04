@@ -28,7 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using NUnit.Framework;
 
 namespace NClassifier.Tests
@@ -36,7 +35,7 @@ namespace NClassifier.Tests
 	[TestFixture]
 	public class SimpleClassifierTest
 	{
-		SimpleClassifier _classifier = null;
+		SimpleClassifier _classifier;
 
 		[TestFixtureSetUp]
 		protected void Setup()
@@ -53,7 +52,7 @@ namespace NClassifier.Tests
 		[Test]
 		public void TestGetSearchWord()
 		{
-			string word = "dotnet";
+			var word = "dotnet";
 			_classifier.SearchWord = word;
 			Assert.AreEqual(word, _classifier.SearchWord);
 		}
@@ -61,10 +60,10 @@ namespace NClassifier.Tests
 		[Test]
 		public void TestClassify()
 		{
-			string word = "dotnet";
+			var word = "dotnet";
 			_classifier.SearchWord = word;
 
-			string sentence = "This is a sentence about dotnet";
+			var sentence = "This is a sentence about dotnet";
 			Assert.AreEqual(1d, _classifier.Classify(sentence), 0d);
 			
 			sentence = "This is not";
@@ -74,10 +73,10 @@ namespace NClassifier.Tests
 		[Test]
 		public void TestMatch()
 		{
-			string word = "dotnet";
+			var word = "dotnet";
 			_classifier.SearchWord = word;
 
-			string sentence = "This is a sentence about dotnet";
+			var sentence = "This is a sentence about dotnet";
 			Assert.IsTrue(_classifier.IsMatch(sentence));
 		}
 

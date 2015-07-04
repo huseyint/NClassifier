@@ -28,8 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
-
 namespace NClassifier.Bayesian
 {
 	public interface ICategorizedWordsDataSource : IWordsDataSource

@@ -28,8 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
-
 namespace NClassifier
 {
 	public interface ITrainableClassifier : ICategorizedClassifier, ITrainable

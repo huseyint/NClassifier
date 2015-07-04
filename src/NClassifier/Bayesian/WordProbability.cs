@@ -38,7 +38,7 @@ namespace NClassifier.Bayesian
 	[Serializable]
 	public class WordProbability : IComparable
 	{
-		static int UNDEFINED = -1;
+		static readonly int UNDEFINED = -1;
 
 		string _word = string.Empty;
 		string _category = string.Empty;
@@ -46,7 +46,7 @@ namespace NClassifier.Bayesian
 		long _nonMatchingCount = UNDEFINED;
 		double _probability = IClassifierConstants.NEUTRAL_PROBABILITY;
 
-        public string Word 
+		public string Word 
 		{ 
 			get { return _word; } 
 			set { _word = value; } 
@@ -61,9 +61,12 @@ namespace NClassifier.Bayesian
 		public long MatchingCount 
 		{ 
 			get 
-			{ 
+			{
 				if (_matchingCount == UNDEFINED)
+				{
 					throw new ApplicationException("MatchingCount has not been defined.");
+				}
+
 				return _matchingCount; 
 			} 
 			set 
@@ -76,9 +79,12 @@ namespace NClassifier.Bayesian
 		public long NonMatchingCount
 		{ 
 			get 
-			{ 
+			{
 				if (_nonMatchingCount == UNDEFINED)
+				{
 					throw new ApplicationException("NonMatchingCount has not been defined.");
+				}
+
 				return _nonMatchingCount;
 			} 
 			set 
@@ -126,40 +132,47 @@ namespace NClassifier.Bayesian
 
 		private void CalculateProbability()
 		{
-			double result = IClassifierConstants.NEUTRAL_PROBABILITY;
+			_probability = IClassifierConstants.NEUTRAL_PROBABILITY;
 
 			if (_matchingCount == 0)
 			{
-				if (_nonMatchingCount == 0)
-					result = IClassifierConstants.NEUTRAL_PROBABILITY;
-				else
-					result = IClassifierConstants.LOWER_BOUND;
+				_probability = _nonMatchingCount == 0 ? IClassifierConstants.NEUTRAL_PROBABILITY : IClassifierConstants.LOWER_BOUND;
 			}
 			else
-				result = BayesianClassifier.NormalizeSignificance((double)_matchingCount / (double)(_matchingCount + _nonMatchingCount));
-
-			_probability = result;
+			{
+				_probability = BayesianClassifier.NormalizeSignificance(_matchingCount / (double)(_matchingCount + _nonMatchingCount));
+			}
 		}
 
 		#region IComparable Members
+
 		public int CompareTo(object obj)
 		{
 			if (!(obj is WordProbability))
-				throw new InvalidCastException(obj.GetType().ToString() + " is not a " + GetType().ToString());
-			WordProbability rhs = (WordProbability)obj;
-			
-			if (this.Category != rhs.Category)
-				return this.Category.CompareTo(rhs.Category);
-			else if (this.Word != rhs.Word)
-				return this.Word.CompareTo(rhs.Word);
-			else 
-				return 0;
+			{
+				throw new InvalidCastException(obj.GetType() + " is not a " + GetType());
+			}
+
+			var rhs = (WordProbability)obj;
+
+			if (Category != rhs.Category)
+			{
+				return Category.CompareTo(rhs.Category);
+			}
+
+			if (Word != rhs.Word)
+			{
+				return Word.CompareTo(rhs.Word);
+			}
+
+			return 0;
 		}
 
-		public string ToString()
+		public override string ToString()
 		{
-			return GetType().ToString() + "Word" + Word + "Probability" + Probability + "MatchingCount" + MatchingCount + "NonMatchingCount" + NonMatchingCount;
+			return string.Format("{0}Word{1}Probability{2}MatchingCount{3}NonMatchingCount{4}", GetType(), Word, Probability, MatchingCount, NonMatchingCount);
 		}
+
 		#endregion
 	}
 }

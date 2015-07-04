@@ -28,7 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using NUnit.Framework;
 
 namespace NClassifier.Tests

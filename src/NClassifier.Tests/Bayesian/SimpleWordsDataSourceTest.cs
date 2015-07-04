@@ -28,9 +28,8 @@
 '********************************************************************************/
 #endregion
 
-using System;
-using NUnit.Framework;
 using NClassifier.Bayesian;
+using NUnit.Framework;
 
 namespace NClassifier.Tests.Bayesian
 {

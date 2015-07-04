@@ -46,7 +46,7 @@ namespace NClassifier
 		public static int BREAK_ON_WHITESPACE = 2;
 
 		int _tokenizerConfig = -1;
-		string _customTokenizerRegExp = null;
+		string _customTokenizerRegExp;
 
 		#region Properties
 		public int TokenizerConfig 
@@ -88,23 +88,25 @@ namespace NClassifier
 
 		public virtual string[] Tokenize(string input)
 		{
-			string regexp = string.Empty;
+			string regexp;
 			if (_customTokenizerRegExp != null)
-				regexp = CustomTokenizerRegExp;
-			else if (_tokenizerConfig == BREAK_ON_WORD_BREAKS)
-				regexp = @"\W";
-			else if (_tokenizerConfig == BREAK_ON_WHITESPACE)
-				regexp = @"\s";
-			else
-				throw new Exception("Illegal tokenizer configuration. CustomTokenizerRegExp = null and TokenizerConfig = " + _tokenizerConfig);
-
-			if (input != null)
 			{
-				string[] words = Regex.Split(input, regexp, RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
-				return words;
+				regexp = CustomTokenizerRegExp;
+			}
+			else if (_tokenizerConfig == BREAK_ON_WORD_BREAKS)
+			{
+				regexp = @"\W";
+			}
+			else if (_tokenizerConfig == BREAK_ON_WHITESPACE)
+			{
+				regexp = @"\s";
 			}
 			else
-				return new string[0];			
+			{
+				throw new Exception("Illegal tokenizer configuration. CustomTokenizerRegExp = null and TokenizerConfig = " + _tokenizerConfig);
+			}
+
+			return input == null ? new string[0] : Regex.Split(input, regexp, RegexOptions.IgnorePatternWhitespace | RegexOptions.Singleline);
 		}
 	}
 }

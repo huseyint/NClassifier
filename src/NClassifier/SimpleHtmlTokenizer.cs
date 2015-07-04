@@ -50,11 +50,17 @@ namespace NClassifier
 		/// <summary>
 		/// Constructor uses BREAK_ON_WORD_BREAKS tokenizer config by default.
 		/// </summary>
-		public SimpleHtmlTokenizer() : base() {}
+		public SimpleHtmlTokenizer()
+		{
+		}
 
-		public SimpleHtmlTokenizer(int tokenizerConfig) : base(tokenizerConfig) {}
+		public SimpleHtmlTokenizer(int tokenizerConfig) : base(tokenizerConfig)
+		{
+		}
 
-		public SimpleHtmlTokenizer(string regularExpression) : base(regularExpression) {}
+		public SimpleHtmlTokenizer(string regularExpression) : base(regularExpression)
+		{
+		}
 
 		/// <summary>
 		/// Replaces entity references with spaces.
@@ -64,57 +70,65 @@ namespace NClassifier
 		public string ResolveEntities(string contentsWithUnresolvedEntityReferences)
 		{
 			if (contentsWithUnresolvedEntityReferences == null)
-				throw new ArgumentException("Cannot pass null.", "contentsWithUnresolvedEntityReferences");
+			{
+				throw new ArgumentException("contentsWithUnresolvedEntityReferences");
+			}
+
 			return Regex.Replace(contentsWithUnresolvedEntityReferences, "&.{2,8};", " ");
 		}
 
 		public override string[] Tokenize(string input)
 		{
-			Stack stack = new Stack();
-			Stack tagStack = new Stack();
+			var stack = new Stack();
+			var tagStack = new Stack();
 
 			// iterate over the input string and parse find text that would be displayed
-			char[] chars = input.ToCharArray();
+			var chars = input.ToCharArray();
 
-            StringBuilder result = new StringBuilder();
-			StringBuilder currentTagName = new StringBuilder();
-			for (int i = 0; i < chars.Length; i++)
+			var result = new StringBuilder();
+			var currentTagName = new StringBuilder();
+			for (var i = 0; i < chars.Length; i++)
 			{
 				switch (chars[i])
 				{
-					case '<' : 
+					case '<':
 						stack.Push(true);
 						currentTagName = new StringBuilder();
 						break;
-					case '>' :
+					case '>':
 						stack.Pop();
 						if (currentTagName != null)
 						{
-							string currentTag = currentTagName.ToString();
+							var currentTag = currentTagName.ToString();
 							if (currentTag.StartsWith("/"))
 								tagStack.Pop();
 							else
 								tagStack.Push(currentTag.ToLower());
 						}
 						break;
-					default :
+					default:
 						if (stack.Count == 0)
 						{
-							string currentTag = (string)tagStack.Peek();
+							var currentTag = (string)tagStack.Peek();
 							// ignore everything inside <script></script> or <style></style>
 							if (currentTag != null)
 							{
 								if (!(currentTag.StartsWith("script") || currentTag.StartsWith("style")))
+								{
 									result.Append(chars[i]);
+								}
 							}
 							else
+							{
 								result.Append(chars[i]);
+							}
 						}
 						else
 							currentTagName.Append(chars[i]);
 						break;
 				}
 			}
+
 			return base.Tokenize(ResolveEntities(result.ToString()).Trim());
 		}
 	}

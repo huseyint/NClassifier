@@ -28,14 +28,13 @@
 '********************************************************************************/
 #endregion
 
-using System;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace NClassifier.Bayesian
 {
 	public class SimpleWordsDataSource : IWordsDataSource
 	{
-		private Hashtable _words = new Hashtable();
+		private readonly Dictionary<string, WordProbability> _words = new Dictionary<string, WordProbability>();
 
 		public void SetWordProbability(WordProbability wp)
 		{
@@ -44,34 +43,46 @@ namespace NClassifier.Bayesian
 
 		public WordProbability GetWordProbability(string word)
 		{
-			if (_words.ContainsKey(word))
-				return (WordProbability)_words[word];
-			else
-				return null;
+			WordProbability wordProbability;
+			_words.TryGetValue(word, out wordProbability);
+
+			return wordProbability;
 		}
 
-		public ICollection GetAll()
+		public ICollection<WordProbability> GetAll()
 		{
 			return _words.Values;
 		}
 
 		public void AddMatch(string word)
 		{
-			WordProbability wp = (WordProbability)_words[word];
-			if (wp == null)
-				wp = new WordProbability(word, 1, 0);
-			else
+			WordProbability wp;
+
+			if (_words.TryGetValue(word, out wp))
+			{
 				wp.MatchingCount++;
+			}
+			else
+			{
+				wp = new WordProbability(word, 1, 0);
+			}
+
 			SetWordProbability(wp);
 		}
 
 		public void AddNonMatch(string word)
 		{
-			WordProbability wp = (WordProbability)_words[word];
-			if (wp == null)
-				wp = new WordProbability(word, 0, 1);
-			else
+			WordProbability wp;
+
+			if (_words.TryGetValue(word, out wp))
+			{
 				wp.NonMatchingCount++;
+			}
+			else
+			{
+				wp = new WordProbability(word, 0, 1);
+			}
+
 			SetWordProbability(wp);
 		}
 	}

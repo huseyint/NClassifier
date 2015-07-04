@@ -48,10 +48,13 @@ namespace NClassifier
 			{
 				return cutoff; 
 			}
-			set 
-			{ 
+			set
+			{
 				if (cutoff > 1 || cutoff < 0)
+				{
 					throw new ArgumentOutOfRangeException("Cutoff must be equal to or greater than 0 and less than or equal to 1.");
+				}
+
 				cutoff = value;
 			}
 		}
@@ -62,7 +65,7 @@ namespace NClassifier
 		{
 			try
 			{
-				double matchProbability = Classify(input);
+				var matchProbability = Classify(input);
 				return IsMatch(matchProbability);
 			}
 			catch (Exception ex)

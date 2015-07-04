@@ -28,20 +28,19 @@
 '********************************************************************************/
 #endregion
 
-using System;
-using NUnit.Framework;
 using NClassifier.Bayesian;
+using NUnit.Framework;
 
 namespace NClassifier.Tests.Bayesian
 {
 	public class AbstractWordsDataSourceSupport
 	{
-		protected IWordsDataSource wordsDataSource = null;
+		protected IWordsDataSource wordsDataSource;
 
 		public void TestEmptySource()
 		{
 			wordsDataSource = new SimpleWordsDataSource();
-			WordProbability wp = wordsDataSource.GetWordProbability("myWord");
+			var wp = wordsDataSource.GetWordProbability("myWord");
 			Assert.IsNull(wp);
 		}
 
@@ -49,7 +48,7 @@ namespace NClassifier.Tests.Bayesian
 		{
 			wordsDataSource = new SimpleWordsDataSource();
 			wordsDataSource.AddMatch("myWord");
-			WordProbability wp = wordsDataSource.GetWordProbability("myWord");
+			var wp = wordsDataSource.GetWordProbability("myWord");
 			Assert.IsNotNull(wp);
 			Assert.AreEqual(1, wp.MatchingCount);
 			Assert.AreEqual(0, wp.NonMatchingCount);
@@ -64,7 +63,7 @@ namespace NClassifier.Tests.Bayesian
 		{
 			wordsDataSource = new SimpleWordsDataSource();
 			wordsDataSource.AddNonMatch("myWord");
-			WordProbability wp = wordsDataSource.GetWordProbability("myWord");
+			var wp = wordsDataSource.GetWordProbability("myWord");
 			Assert.IsNotNull(wp);
 			Assert.AreEqual(0, wp.MatchingCount);
 			Assert.AreEqual(1, wp.NonMatchingCount);
@@ -80,11 +79,11 @@ namespace NClassifier.Tests.Bayesian
 		public void TestAddMultipleMatches()
 		{
 			wordsDataSource = new SimpleWordsDataSource();
-			string word = "myWord";
-			int count = 10;
-			for (int i = 0; i < count; i++)
+			var word = "myWord";
+			var count = 10;
+			for (var i = 0; i < count; i++)
 				wordsDataSource.AddMatch(word);
-			WordProbability wp = wordsDataSource.GetWordProbability(word);
+			var wp = wordsDataSource.GetWordProbability(word);
 			Assert.IsNotNull(wp);
 			Assert.AreEqual(count, wp.MatchingCount);
 		}
@@ -92,11 +91,11 @@ namespace NClassifier.Tests.Bayesian
 		public void TestAddMultipleNonMatches()
 		{
 			wordsDataSource = new SimpleWordsDataSource();
-			string word = "myWord";
-			int count = 10;
-			for (int i = 0; i < count; i++)
+			var word = "myWord";
+			var count = 10;
+			for (var i = 0; i < count; i++)
 				wordsDataSource.AddNonMatch(word);
-			WordProbability wp = wordsDataSource.GetWordProbability(word);
+			var wp = wordsDataSource.GetWordProbability(word);
 			Assert.IsNotNull(wp);
 			Assert.AreEqual(count, wp.NonMatchingCount);
 		}
@@ -104,9 +103,9 @@ namespace NClassifier.Tests.Bayesian
 		public void TestMultipleWrites()
 		{
 			wordsDataSource = new SimpleWordsDataSource();
-			string word = "myWord";
-			int count = 500;
-			for (int i =0; i < count; i++)
+			var word = "myWord";
+			var count = 500;
+			for (var i =0; i < count; i++)
 				wordsDataSource.AddNonMatch(word + count);
 		}
 	}

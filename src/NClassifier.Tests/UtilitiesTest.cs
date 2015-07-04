@@ -29,57 +29,56 @@
 #endregion
 
 using System;
-using System.Collections;
-using NUnit.Framework;
 using NClassifier.Bayesian;
+using NUnit.Framework;
 
 namespace NClassifier.Tests
 {
 	[TestFixture]
 	public class UtilitiesTest
 	{
-		string sentence = "Hello there hello again and hello again.";
+		readonly string sentence = "Hello there hello again and hello again.";
 
 		[Test]
 		public void TestGetWordFrequency()
 		{
 			// standard test
-			Hashtable result = Utilities.GetWordFrequency(sentence);
+			var result = Utilities.GetWordFrequency(sentence);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(2, result.Count);
 			Assert.IsNotNull(result["hello"]);
-			Assert.AreEqual(3, (int)result["hello"]);
-			Assert.AreEqual(2, (int)result["again"]);
+			Assert.AreEqual(3, result["hello"]);
+			Assert.AreEqual(2, result["again"]);
 
 			// test case sensitivity
 			result = Utilities.GetWordFrequency(sentence, true);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(3, result.Count);
 			Assert.IsNotNull(result["hello"]);
-			Assert.AreEqual(2, (int)result["hello"]);
-			Assert.AreEqual(1, (int)result["Hello"]);
-			Assert.AreEqual(2, (int)result["again"]);
+			Assert.AreEqual(2, result["hello"]);
+			Assert.AreEqual(1, result["Hello"]);
+			Assert.AreEqual(2, result["again"]);
 
 			// test without a stop word provider
 			result = Utilities.GetWordFrequency(sentence, false, new DefaultTokenizer(), null);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(5, result.Count);
 			Assert.IsNotNull(result["hello"]);
-			Assert.AreEqual(3, (int)result["hello"]);
-			Assert.AreEqual(1, (int)result["there"]);
-			Assert.AreEqual(1, (int)result["and"]);
-			Assert.AreEqual(2, (int)result["again"]);
+			Assert.AreEqual(3, result["hello"]);
+			Assert.AreEqual(1, result["there"]);
+			Assert.AreEqual(1, result["and"]);
+			Assert.AreEqual(2, result["again"]);
 		}
 
 		[Test]
 		public void TestGetUniqueWords()
 		{
-			string[] result = Utilities.GetUniqueWords(null);
+			var result = Utilities.GetUniqueWords(null);
 			Assert.IsNotNull(result);
 			Assert.AreEqual(0, result.Length);
 
-			string[] input = new string[] { "one", "one", "one", "two", "three" };
-			string[] expectedResult = new string[] { "one", "three", "two" };
+			string[] input = { "one", "one", "one", "two", "three" };
+			string[] expectedResult = { "one", "three", "two" };
 
 			result = Utilities.GetUniqueWords(input);
 
@@ -89,10 +88,10 @@ namespace NClassifier.Tests
 			Array.Sort(expectedResult);
 			Array.Sort(result);
 
-			for (int i = 0; i < expectedResult.Length; i++)
+			for (var i = 0; i < expectedResult.Length; i++)
 				Assert.AreEqual(expectedResult[i], result[i]);
 
-			string[] words = new DefaultTokenizer().Tokenize(sentence.ToLower());
+			var words = new DefaultTokenizer().Tokenize(sentence.ToLower());
 			result = Utilities.GetUniqueWords(words);
 			Assert.AreEqual(5, result.Length);
 		}
@@ -120,45 +119,40 @@ namespace NClassifier.Tests
 		[Test]
 		public void TestGetSentences()
 		{
-			string[] result = Utilities.GetSentences(null);
+			var result = Utilities.GetSentences(null);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(0, result.Length);
+			Assert.AreEqual(0, result.Count);
 
-			string sentence1 = "This is sentence one";
-			string sentence2 = "This is sentence two";
-			string someSentences = sentence1 + "... " + sentence2 + "..";
+			var sentence1 = "This is sentence one";
+			var sentence2 = "This is sentence two";
+			var someSentences = sentence1 + "... " + sentence2 + "..";
 			result = Utilities.GetSentences(someSentences);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(2, result.Length);
+			Assert.AreEqual(2, result.Count);
 			Assert.AreEqual(sentence1, result[0].Trim());
 			Assert.AreEqual(sentence2, result[1].Trim());
 
 			someSentences = sentence1 + "! " + sentence2 + ".";
 			result = Utilities.GetSentences(someSentences);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(2, result.Length);
+			Assert.AreEqual(2, result.Count);
 			Assert.AreEqual(sentence1, result[0].Trim());
 			Assert.AreEqual(sentence2, result[1].Trim());
 
 			someSentences = sentence1 + "? " + sentence2 + ".";
 			result = Utilities.GetSentences(someSentences);
 			Assert.IsNotNull(result);
-			Assert.AreEqual(2, result.Length);
+			Assert.AreEqual(2, result.Count);
 			Assert.AreEqual(sentence1, result[0].Trim());
 			Assert.AreEqual(sentence2, result[1].Trim());
 		}
 
-//		[Test]
-//		public void TestGetString()
-//		{
-//			Assert.AreEqual(sentence, Utilities.GetString(new ByteArra
-
 		[Test]
 		public void TestTeaching()
 		{
-			BayesianClassifier classifier = new BayesianClassifier();
+			var classifier = new BayesianClassifier();
 
-			string[] sentence1 = new string[] {"The", "menu", "tag", "library", "manages", "the", 
+			string[] sentence1 = {"The", "menu", "tag", "library", "manages", "the", 
 								"complex", "process", "of", "creating", "menus", "in",
 								"JavaScript", "The", "menu", "tag", "itself", "is", 
 								"an", "abstract", "class", "that", "extends", "the", 
@@ -174,7 +168,7 @@ namespace NClassifier.Tests
 								"uses", "menu", "builders", "to", "render", "menu", 
 								"data", "from", "the", "data", "source"};
 								  						
-			string[] sentence2 = new string[] {"I", "witness", "a", "more", "subtle", 
+			string[] sentence2 = {"I", "witness", "a", "more", "subtle", 
 								"demonstration", "of", "real", "time", "physics", 
 								"simulation", "at", "the", "tiny", "Palo", "Alto", 
 								"office", "of", "Havok", "a", "competing", "physics", 
@@ -195,7 +189,7 @@ namespace NClassifier.Tests
 								"the", "air,", "splash", "into", "the", "water,", 
 								"and", "sink"};
 								  
-			string[] sentence3 = new string[] {"The", "New", "Input", "Output", "NIO", "libraries", 
+			string[] sentence3 = {"The", "New", "Input", "Output", "NIO", "libraries", 
 								"introduced", "in", "Java", "2", "Platform", 
 								"Standard", "Edition", "J2SE", "1.4", "address", 
 								"this", "problem", "NIO", "uses", "a", "buffer", 
@@ -206,7 +200,7 @@ namespace NClassifier.Tests
 								"use", "of", "OS", "level", "facilities", "where", 
 								"possible", "to", "maximize", "throughput"};
 								 
-			string[] sentence4 = new string[] {"As", "governments", "scramble", "to", "contain", 
+			string[] sentence4 = {"As", "governments", "scramble", "to", "contain", 
 								"SARS", "the", "World", "Health", "Organisation", 
 								"said", "it", "was", "extending", "the", "scope", "of",
 								"its", "April", "2", "travel", "alert", "to", 
@@ -215,7 +209,7 @@ namespace NClassifier.Tests
 								"with", "Toronto", "the", "epicentre", "of", "the", 
 								"SARS", "outbreak", "in", "Canada"};
 								 
-			string[] sentence5 = new string[] {"That", "was", "our", "worst", "problem", "I", 
+			string[] sentence5 = {"That", "was", "our", "worst", "problem", "I", 
 								"tried", "to", "see", "it", "the", "XP", "way", "Well",
 								"what", "we", "can", "do", "is", "implement", 
 								"something", "I", "can't", "give", "any", "guarantees",
@@ -231,8 +225,7 @@ namespace NClassifier.Tests
 								"OverTime", "But", "I", "should", "be", "able", "to", 
 								"do", "something", "simple", "that", "will", "have", 
 								"very", "few", "bugs", "and", "show", "a", "working", 
-								"program", "early", "and", "often"}; 		
-	    
+								"program", "early", "and", "often"};
 
 			classifier.TeachMatch(ICategorizedClassifierConstants.DEFAULT_CATEGORY, sentence1);
 			classifier.TeachNonMatch(ICategorizedClassifierConstants.DEFAULT_CATEGORY, sentence2);

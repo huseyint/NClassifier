@@ -29,51 +29,56 @@
 #endregion
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace NClassifier
 {
-	public class Utilities
+	public static class Utilities
 	{
-		public static Hashtable GetWordFrequency(string input)
-		{
-			return GetWordFrequency(input, false);
-		}
-
-		public static Hashtable GetWordFrequency(string input, bool caseSensitive)
+		public static IDictionary<string, int> GetWordFrequency(string input, bool caseSensitive = false)
 		{
 			return GetWordFrequency(input, caseSensitive, new DefaultTokenizer(), new DefaultStopWordProvider());
 		}
 
 		/// <summary>
-		/// Gets a Hashtable of words and integers representing the number of each word.
+		/// Gets a dictionary of words and integers representing the number of each word.
 		/// </summary>
 		/// <param name="input">The string to get the word frequency of.</param>
 		/// <param name="caseSensitive">True if words should be treated as separate if they have different casing.</param>
 		/// <param name="tokenizer">A instance of ITokenizer.</param>
 		/// <param name="stopWordProvider">An instance of IStopWordProvider.</param>
 		/// <returns></returns>
-		public static Hashtable GetWordFrequency(string input, bool caseSensitive, ITokenizer tokenizer, IStopWordProvider stopWordProvider)
+		public static IDictionary<string, int> GetWordFrequency(string input, bool caseSensitive, ITokenizer tokenizer, IStopWordProvider stopWordProvider)
 		{
-			string convertedInput = input;
+			var convertedInput = input;
 			if (!caseSensitive)
+			{
 				convertedInput = input.ToLower();
+			}
 
-			string[] words = tokenizer.Tokenize(convertedInput);
+			var words = tokenizer.Tokenize(convertedInput);
 			Array.Sort(words);
 
-			string[] uniqueWords = GetUniqueWords(words);
+			var uniqueWords = GetUniqueWords(words);
 
-			Hashtable result = new Hashtable();
-			for (int i = 0; i < uniqueWords.Length; i++)
+			var result = new Dictionary<string, int>();
+			for (var i = 0; i < uniqueWords.Length; i++)
 			{
-				if (stopWordProvider == null || (IsWord(uniqueWords[i]) && !stopWordProvider.IsStopWord(uniqueWords[i])))
+				var word = uniqueWords[i];
+
+				if (stopWordProvider == null || (IsWord(word) && !stopWordProvider.IsStopWord(word)))
 				{
-					if (result.ContainsKey(uniqueWords[i]))
-						result[uniqueWords[i]] = (int)result[uniqueWords[i]] + CountWords(uniqueWords[i], words);
+					int value;
+					if (result.TryGetValue(word, out value))
+					{
+						result[word] = value + CountWords(word, words);
+					}
 					else
-						result.Add(uniqueWords[i], CountWords(uniqueWords[i], words));
+					{
+						result.Add(word, CountWords(word, words));
+					}
 				}
 			}
 
@@ -82,10 +87,7 @@ namespace NClassifier
 
 		public static bool IsWord(string word)
 		{
-			if (word != null && word.Trim() != string.Empty)
-				return true;
-			else
-				return false;
+			return word != null && word.Trim() != string.Empty;
 		}
 
 		/// <summary>
@@ -96,15 +98,20 @@ namespace NClassifier
 		public static string[] GetUniqueWords(string[] input)
 		{
 			if (input == null)
-				return new string[0];
-			else
 			{
-				ArrayList result = new ArrayList();
-				for (int i = 0; i < input.Length; i++)
-					if (!result.Contains(input[i]))
-						result.Add(input[i]);
-				return (string[])result.ToArray("".GetType());
+				return new string[0];
 			}
+			
+			var result = new List<string>();
+			foreach (var word in input)
+			{
+				if (!result.Contains(word))
+				{
+					result.Add(word);
+				}
+			}
+
+			return result.ToArray();
 		}
 
 		/// <summary>
@@ -115,25 +122,29 @@ namespace NClassifier
 		public static int CountWords(string word, string[] words)
 		{
 			// find the index of one of the items in the array
-			int itemIndex = Array.BinarySearch(words, word);
+			var itemIndex = Array.BinarySearch(words, word);
 
 			// iterate backwards until we find the first match
-			if (itemIndex > 0)
-				while (itemIndex > 0 && words[itemIndex] == word)
-					itemIndex--;
+			while (itemIndex > 0 && words[itemIndex] == word)
+			{
+				itemIndex--;
+			}
 
 			// now itemIndex is one item before the start of the words
-			int count = 0;
+			var count = 0;
 			while (itemIndex < words.Length && itemIndex >= 0)
 			{
 				if (words[itemIndex] == word)
+				{
 					count++;
+				}
 
 				itemIndex++;
 
-				if (itemIndex < words.Length)
-					if (words[itemIndex] != word)
-						break;
+				if (itemIndex < words.Length && words[itemIndex] != word)
+				{
+					break;
+				}
 			}
 
 			return count;
@@ -144,23 +155,19 @@ namespace NClassifier
 		/// </summary>
 		/// <param name="input">A string that contains sentences.</param>
 		/// <returns>An array of strings, each element containing a sentence.</returns>
-		public static string[] GetSentences(string input)
+		public static IList<string> GetSentences(string input)
 		{
 			if (input == null)
-				return new string[0];
-			else
 			{
-				// split on a ".", a "!", a "?" followed by a space or EOL
-				// the original Java regex was (\.|!|\?)+(\s|\z)
-				string[] result = Regex.Split(input, @"(?:\.|!|\?)+(?:\s+|\z)");
-
-				// hacky... doing this to pass the unit tests
-				ArrayList list = new ArrayList();
-				foreach (string s in result)
-					if (s.Length > 0)
-						list.Add(s);
-				return (string[])list.ToArray(typeof(string));
+				return new string[0];
 			}
+			
+			// split on a ".", a "!", a "?" followed by a space or EOL
+			// the original Java regex was (\.|!|\?)+(\s|\z)
+			var result = Regex.Split(input, @"(?:\.|!|\?)+(?:\s+|\z)");
+
+			// hacky... doing this to pass the unit tests
+			return result.Where(s => s.Length > 0).ToArray();
 		}
 	}
 }

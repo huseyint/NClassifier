@@ -28,8 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
-
 namespace NClassifier
 {
 	/// <summary>
@@ -62,8 +60,8 @@ namespace NClassifier
 		{
 			if (_i == _wordToStem.Length)
 			{
-				char[] new_b = new char[_i + INC];
-				for (int c = 0; c < _i; c++)
+				var new_b = new char[_i + INC];
+				for (var c = 0; c < _i; c++)
 					new_b[c] = _wordToStem[c];
 				_wordToStem = new_b;
 			}
@@ -110,8 +108,8 @@ namespace NClassifier
 		/// </summary>
 		private int M()
 		{
-			int n = 0;
-			int i = 0;
+			var n = 0;
+			var i = 0;
 			while (true)
 			{
 				if (i > _j)
@@ -140,13 +138,13 @@ namespace NClassifier
 				while (true) 
 				{
 					if (i > _j) 
-					{                
+					{
 						return n;
 					}
 					if (Cons(i)) 
 					{
 						break;
-					}                    
+					}
 					i++;
 				}
 				i++;
@@ -169,20 +167,17 @@ namespace NClassifier
 		}
 
 		/* DoubleC(j) is true <=> j,(j-1) contain a double consonant. */
-		private bool DoubleC(int j) 
+		private bool DoubleC(int j)
 		{
 			if (j < 1) 
 			{
 				return false;
-			} 
-			else if (_wordToStem[j] != _wordToStem[j - 1]) 
+			}
+			if (_wordToStem[j] != _wordToStem[j - 1]) 
 			{
 				return false;
-			} 
-			else 
-			{
-				return Cons(j);
-			}        
+			}
+			return Cons(j);
 		}
 
 		/* Cvc(i) is true <=> i-2,i-1,i has the form consonant - vowel - consonant
@@ -198,29 +193,25 @@ namespace NClassifier
 			if (i < 2 || !Cons(i) || Cons(i - 1) || !Cons(i - 2)) 
 			{
 				return false;
-			} 
-			else 
+			}
+			int ch = _wordToStem[i];
+			if (ch == 'w' || ch == 'x' || ch == 'y') 
 			{
-				int ch = _wordToStem[i];
-				if (ch == 'w' || ch == 'x' || ch == 'y') 
-				{
-					return false;
-				}
-
+				return false;
 			}
 			return true;
 		}
 
 		private bool End(string s) 
 		{
-			int l = s.Length;
-			int o = _k - l + 1;
+			var l = s.Length;
+			var o = _k - l + 1;
 			if (o < 0) 
 			{
 				return false;
 			}
 
-			for (int i = 0; i < l; i++) 
+			for (var i = 0; i < l; i++) 
 			{
 				if (_wordToStem[o + i] != s[i]) 
 				{
@@ -235,9 +226,9 @@ namespace NClassifier
 		   k. */
 		private void setto(string s) 
 					  {
-						  int l = s.Length;
-						  int o = _j + 1;
-						  for (int i = 0; i < l; i++)
+						  var l = s.Length;
+						  var o = _j + 1;
+						  for (var i = 0; i < l; i++)
 							  _wordToStem[o + i] = s[i];
 						  _k = _j + l;
 					  }
@@ -335,7 +326,6 @@ namespace NClassifier
 					if (End("tional")) 
 					{
 						r("tion");
-						break;
 					}
 					break;
 				case 'c' :
@@ -347,14 +337,12 @@ namespace NClassifier
 					if (End("anci")) 
 					{
 						r("ance");
-						break;
 					}
 					break;
 				case 'e' :
 					if (End("izer")) 
 					{
 						r("ize");
-						break;
 					}
 					break;
 				case 'l' :
@@ -381,7 +369,6 @@ namespace NClassifier
 					if (End("ousli")) 
 					{
 						r("ous");
-						break;
 					}
 					break;
 				case 'o' :
@@ -398,7 +385,6 @@ namespace NClassifier
 					if (End("ator")) 
 					{
 						r("ate");
-						break;
 					}
 					break;
 				case 's' :
@@ -420,7 +406,6 @@ namespace NClassifier
 					if (End("ousness")) 
 					{
 						r("ous");
-						break;
 					}
 					break;
 				case 't' :
@@ -437,14 +422,12 @@ namespace NClassifier
 					if (End("biliti")) 
 					{
 						r("ble");
-						break;
 					}
 					break;
 				case 'g' :
 					if (End("logi")) 
 					{
 						r("log");
-						break;
 					}
 					break;
 			}
@@ -470,14 +453,12 @@ namespace NClassifier
 					if (End("alize")) 
 					{
 						r("al");
-						break;
 					}
 					break;
 				case 'i' :
 					if (End("iciti")) 
 					{
 						r("ic");
-						break;
 					}
 					break;
 				case 'l' :
@@ -489,14 +470,12 @@ namespace NClassifier
 					if (End("ful")) 
 					{
 						r("");
-						break;
 					}
 					break;
 				case 's' :
 					if (End("ness")) 
 					{
 						r("");
-						break;
 					}
 					break;
 			}
@@ -589,7 +568,7 @@ namespace NClassifier
 			_j = _k;
 			if (_wordToStem[_k] == 'e') 
 			{
-				int a = M();
+				var a = M();
 				if (a > 1 || a == 1 && !Cvc(_k - 1))
 					_k--;
 			}

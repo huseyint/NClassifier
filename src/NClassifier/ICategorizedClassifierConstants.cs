@@ -28,8 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
-
 namespace NClassifier
 {
 	public sealed class ICategorizedClassifierConstants

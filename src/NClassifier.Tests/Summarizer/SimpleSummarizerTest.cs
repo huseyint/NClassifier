@@ -28,7 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using NClassifier.Summarizer;
 using NUnit.Framework;
 
@@ -37,7 +36,7 @@ namespace NClassifier.Tests.Summarizer
 	[TestFixture]
 	public class SimpleSummarizerTest
 	{
-		SimpleSummarizer summarizer = null;
+		SimpleSummarizer summarizer;
 
 		[TestFixtureSetUp]
 		public void Setup()
@@ -54,9 +53,9 @@ namespace NClassifier.Tests.Summarizer
 		[Test]
 		public void TestSummarize()
 		{
-			string input = "NClassifier is a dotnet assembly for working with text.  NClassifier includes a summarizer.";
-			string expectedResult = "NClassifier is a dotnet assembly for working with text.";
-			string result = summarizer.Summarize(input, 1);
+			var input = "NClassifier is a dotnet assembly for working with text.  NClassifier includes a summarizer.";
+			var expectedResult = "NClassifier is a dotnet assembly for working with text.";
+			var result = summarizer.Summarize(input, 1);
 			Assert.AreEqual(expectedResult, result);
 
 			input = "NClassifier is a dotnet assembly for working with text. NClassifier includes a summarizer. A Summarizer allows the summary of text. A Summarizer is really cool. I don't think there are any other dotnet summarizers.";

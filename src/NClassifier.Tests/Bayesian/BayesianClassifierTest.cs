@@ -28,9 +28,8 @@
 '********************************************************************************/
 #endregion
 
-using System;
-using NUnit.Framework;
 using NClassifier.Bayesian;
+using NUnit.Framework;
 
 namespace NClassifier.Tests.Bayesian
 {
@@ -40,10 +39,10 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestClassify()
 		{
-			SimpleWordsDataSource wds = new SimpleWordsDataSource();
-			BayesianClassifier classifier = new BayesianClassifier(wds);
+			var wds = new SimpleWordsDataSource();
+			var classifier = new BayesianClassifier(wds);
 
-			string[] sentence = new string[] { "This", "is", "a", "sentence", "about", "java" };
+			var sentence = new[] { "This", "is", "a", "sentence", "about", "java" };
 
 			Assert.AreEqual(IClassifierConstants.NEUTRAL_PROBABILITY, classifier.Classify(ICategorizedClassifierConstants.DEFAULT_CATEGORY, sentence), 0d);
 
@@ -60,34 +59,34 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestGetWordsDataSource()
 		{
-			SimpleWordsDataSource wds = new SimpleWordsDataSource();
-			BayesianClassifier classifier = new BayesianClassifier(wds);
+			var wds = new SimpleWordsDataSource();
+			var classifier = new BayesianClassifier(wds);
 			Assert.AreEqual(wds, classifier.WordsDataSource);
 		}
 
 		[Test]
 		public void TestGetTokenizer()
 		{
-			SimpleWordsDataSource wds = new SimpleWordsDataSource();
+			var wds = new SimpleWordsDataSource();
 			ITokenizer tokenizer = new DefaultTokenizer(DefaultTokenizer.BREAK_ON_WORD_BREAKS);
-			BayesianClassifier classifier = new BayesianClassifier(wds, tokenizer);
+			var classifier = new BayesianClassifier(wds, tokenizer);
 			Assert.AreEqual(tokenizer, classifier.Tokenizer);
 		}
 
 		[Test]
 		public void TestGetStopWordProvider()
 		{
-			SimpleWordsDataSource wds = new SimpleWordsDataSource();
+			var wds = new SimpleWordsDataSource();
 			ITokenizer tokenizer = new DefaultTokenizer(DefaultTokenizer.BREAK_ON_WORD_BREAKS);
 			IStopWordProvider stopWordProvider = new DefaultStopWordProvider();
-			BayesianClassifier classifier = new BayesianClassifier(wds, tokenizer, stopWordProvider);
+			var classifier = new BayesianClassifier(wds, tokenizer, stopWordProvider);
 			Assert.AreEqual(stopWordProvider, classifier.StopWordProvider);
 		}
 
 		[Test]
 		public void TestCaseSensitive()
 		{
-			BayesianClassifier classifier = new BayesianClassifier();
+			var classifier = new BayesianClassifier();
 			Assert.IsFalse(classifier.IsCaseSensitive);
 			classifier.IsCaseSensitive = true;
 			Assert.IsTrue(classifier.IsCaseSensitive);
@@ -96,7 +95,7 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestTransformWord()
 		{
-			BayesianClassifier classifier = new BayesianClassifier();
+			var classifier = new BayesianClassifier();
 			Assert.IsFalse(classifier.IsCaseSensitive);
 
 			string word = null;
@@ -117,20 +116,20 @@ namespace NClassifier.Tests.Bayesian
 		[Test]
 		public void TestCalculateOverallProbability()
 		{
-			double prob = 0.3d;
-			WordProbability wp1 = new WordProbability("myWord1", prob);
-			WordProbability wp2 = new WordProbability("myWord2", prob);
-			WordProbability wp3 = new WordProbability("myWord3", prob);
+			var prob = 0.3d;
+			var wp1 = new WordProbability("myWord1", prob);
+			var wp2 = new WordProbability("myWord2", prob);
+			var wp3 = new WordProbability("myWord3", prob);
 		
-			WordProbability[] wps = new WordProbability[] { wp1, wp2, wp3 };
-			double errorMargin = 0.0001d;
+			var wps = new[] { wp1, wp2, wp3 };
+			var errorMargin = 0.0001d;
 		
-			double xy = (prob * prob * prob);
-			double z = (1-prob)*(1-prob)*(1-prob);
+			var xy = (prob * prob * prob);
+			var z = (1-prob)*(1-prob)*(1-prob);
 		
-			double result = xy/(xy + z);
+			var result = xy/(xy + z);
 		
-			BayesianClassifier classifier = new BayesianClassifier();
+			var classifier = new BayesianClassifier();
 		 		
 			Assert.AreEqual(result, classifier.CalculateOverallProbability(wps), errorMargin);
 		}

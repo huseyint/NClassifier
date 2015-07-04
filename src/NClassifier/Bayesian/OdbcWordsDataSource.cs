@@ -29,9 +29,9 @@
 #endregion
 
 using System;
-using System.Diagnostics;
 using System.Data;
 using System.Data.Odbc;
+using System.Diagnostics;
 
 namespace NClassifier.Bayesian
 {
@@ -73,8 +73,8 @@ namespace NClassifier.Bayesian
 		public WordProbability GetWordProbability(string category, string word)
 		{
 			WordProbability wp = null;
-			int matchingCount = 0;
-			int nonMatchingCount = 0;
+			var matchingCount = 0;
+			var nonMatchingCount = 0;
 
 			OdbcConnection connection = null;
 			try
@@ -83,7 +83,7 @@ namespace NClassifier.Bayesian
 				IDbCommand command = new OdbcCommand("SELECT " + matchCountColumn + ", " + nonMatchCountColumn + " FROM " + tableName + " WHERE " + wordColumn + " = ? AND " + categoryColumn + " = ?", connection);
 				command.Parameters.Add(new OdbcParameter("@Word", OdbcType.VarChar, 255, ParameterDirection.Input, true, 0, 0, string.Empty, DataRowVersion.Proposed, word));
 				command.Parameters.Add(new OdbcParameter("@Category", OdbcType.VarChar, 20, ParameterDirection.Input, true, 0, 0, string.Empty, DataRowVersion.Proposed, category));
-				IDataReader reader = command.ExecuteReader();
+				var reader = command.ExecuteReader();
 				if (reader.Read())
 				{
 					matchingCount = (int)reader[matchCountColumn];
@@ -120,7 +120,7 @@ namespace NClassifier.Bayesian
 
 		private void UpdateWordProbability(string category, string word, bool isMatch)
 		{
-			string fieldName = isMatch ? matchCountColumn : nonMatchCountColumn;
+			var fieldName = isMatch ? matchCountColumn : nonMatchCountColumn;
 
 			// truncate word at 255 characters
 			if (word.Length > 255)
@@ -207,12 +207,12 @@ namespace NClassifier.Bayesian
 			{
 				connection = (OdbcConnection)connectionManager.GetConnection();
 				// TODO figure out better way to see if table exists
-				OdbcCommand command = new OdbcCommand("SELECT TOP 1 * FROM " + tableName, connection);
+				var command = new OdbcCommand("SELECT TOP 1 * FROM " + tableName, connection);
 				try
 				{
 					command.ExecuteNonQuery();
 				}
-				catch (Exception ex)
+				catch (Exception)
 				{
 					command = new OdbcCommand("CREATE TABLE [" + tableName + "] "
 						+ "([" + wordColumn + "] VARCHAR(255) NOT NULL, "
@@ -235,7 +235,9 @@ namespace NClassifier.Bayesian
 					{
 						connectionManager.ReturnConnection(connection);
 					}
-					catch (Exception ex) {}
+					catch (Exception)
+					{
+					}
 				}
 			}
 		}

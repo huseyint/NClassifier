@@ -35,7 +35,8 @@ namespace NClassifier
 	public class DefaultStopWordProvider : IStopWordProvider
 	{
 		#region Fields
-		string[] _stopWords = 
+
+		private readonly string[] _stopWords = 
 		{
 			"a", "and", "the", "me", "i", "of", "if", "it",  
 			"is", "they", "there", "but", "or", "to", "this", "you", 
@@ -43,7 +44,8 @@ namespace NClassifier
 			"have", "be", "at", "or", "was", "so", "out", "not", "an"
 		};
 
-		string[] _sortedStopWords = null;
+		private readonly string[] _sortedStopWords;
+
 		#endregion
 
 		public string[] StopWords { get { return _stopWords; } }
@@ -56,10 +58,12 @@ namespace NClassifier
 
 		public bool IsStopWord(string word)
 		{
-			if (word == null || word == string.Empty)
+			if (string.IsNullOrEmpty(word))
+			{
 				return false;
-			else
-				return Array.BinarySearch(_sortedStopWords, word.ToLower()) >= 0;
+			}
+
+			return Array.BinarySearch(_sortedStopWords, word.ToLower()) >= 0;
 		}
 	}
 }

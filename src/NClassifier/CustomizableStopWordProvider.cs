@@ -29,14 +29,14 @@
 #endregion
 
 using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace NClassifier
 {
 	public class CustomizableStopWordProvider : IStopWordProvider
 	{
-		string _path;
+		readonly string _path;
 		string[] _words;
 
 		public static string DEFAULT_STOPWORD_PROVIDER_FILENAME = "DefaultStopWords.txt";
@@ -54,16 +54,18 @@ namespace NClassifier
 
 		protected void Init()
 		{
-			ArrayList wordsList = new ArrayList();
+			var wordsList = new List<string>();
 			TextReader reader = File.OpenText(_path);
 
 			string word;
 			while ((word = reader.ReadLine()) != null)
+			{
 				wordsList.Add(word.Trim());
+			}
 
 			reader.Close();
 
-			_words = (string[])wordsList.ToArray(typeof(string));
+			_words = wordsList.ToArray();
 
 			Array.Sort(_words);
 		}

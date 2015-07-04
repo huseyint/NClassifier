@@ -28,28 +28,21 @@
 '********************************************************************************/
 #endregion
 
-using System;
-
 namespace NClassifier
 {
 	/// <summary>
 	/// Basic implementation of the IClassifier interface.
 	/// </summary>
-	public class SimpleClassifier : AbstractClassifier, IClassifier
+	public class SimpleClassifier : AbstractClassifier
 	{
-		string _searchWord;
-
 		/// <summary>
 		/// The string to look for when matching.
 		/// </summary>
-		public string SearchWord { get { return _searchWord; } set { _searchWord = value; } }
+		public string SearchWord { get; set; }
 
 		public override double Classify(string input)
 		{
-			if ((input != null) && (input.IndexOf(SearchWord) > 0))
-				return 1;
-			else
-				return 0;
+			return input != null && (input.IndexOf(SearchWord) > 0) ? 1 : 0;
 		}
 	}
 }

@@ -28,7 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using System.Data;
 
 namespace NClassifier.Bayesian
@@ -36,6 +35,7 @@ namespace NClassifier.Bayesian
 	public interface IDbConnectionManager
 	{
 		IDbConnection GetConnection();
+
 		void ReturnConnection(IDbConnection connection);
 	}
 }

@@ -28,7 +28,6 @@
 '********************************************************************************/
 #endregion
 
-using System;
 using NUnit.Framework;
 
 namespace NClassifier.Tests
@@ -53,25 +52,25 @@ namespace NClassifier.Tests
 		[Test]
 		public void TestTokenize()
 		{
-			string input = "<h1>This is in an html tag &gt;</h1>";
+			var input = "<h1>This is in an html tag &gt;</h1>";
 			string[] expected = { "This", "is", "in", "an", "html", "tag" };
 
-			string[] output = tokenizer.Tokenize(input);
+			var output = tokenizer.Tokenize(input);
 			Assert.IsNotNull(output);
 			Assert.AreEqual(expected.Length, output.Length);
 
-			for (int i = 0; i < output.Length; i++)
+			for (var i = 0; i < output.Length; i++)
 				Assert.AreEqual(expected[i], output[i]);
 		}
 
 		[Test]
 		public void TestResolveEntities()
 		{
-			string normalString = "this is a normal string";
-			string resolvedString = tokenizer.ResolveEntities(normalString);
+			var normalString = "this is a normal string";
+			var resolvedString = tokenizer.ResolveEntities(normalString);
 			Assert.AreEqual(normalString, resolvedString);
 
-			string withEnt = "this includes a non-breaking space ";
+			var withEnt = "this includes a non-breaking space ";
 			resolvedString = tokenizer.ResolveEntities(withEnt + "&nbsp;");
 			Assert.AreEqual(withEnt + " ", resolvedString);
 		}

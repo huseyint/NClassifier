@@ -28,31 +28,33 @@
 '********************************************************************************/
 #endregion
 
-using System;
+using System.Data;
 using System.Data.Odbc;
 
 namespace NClassifier.Bayesian
 {
 	public class OdbcConnectionManager : IDbConnectionManager
 	{
-		string _connectionString = string.Empty;
+		private readonly string _connectionString = string.Empty;
 
 		public OdbcConnectionManager(string connectionString)
 		{
 			_connectionString = connectionString;
 		}
 
-		public System.Data.IDbConnection GetConnection()
+		public IDbConnection GetConnection()
 		{
-			OdbcConnection connection = new OdbcConnection(_connectionString);
+			var connection = new OdbcConnection(_connectionString);
 			connection.Open();
 			return connection;
 		}
 
-		public void ReturnConnection(System.Data.IDbConnection connection)
+		public void ReturnConnection(IDbConnection connection)
 		{
 			if (connection != null)
+			{
 				connection.Close();
+			}
 		}
 	}
 }
